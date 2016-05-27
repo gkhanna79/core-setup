@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.Cli.Build
         private string GetLibCLRJitPathForVersion()
         {
             var coreclrRid = GetCoreCLRRid();
-            var crossgenPackagePath = GetCrossGenPackagePathForVersion();
+            var crossgenPackagePath = GetJitPackagePathForVersion();
 
             if (crossgenPackagePath == null)
             {
@@ -64,6 +64,23 @@ namespace Microsoft.DotNet.Cli.Build
                 $"{Constants.DynamicLibPrefix}clrjit{Constants.DynamicLibSuffix}");
         }
 
+        private string GetJitPackagePathForVersion()
+        {
+            string coreclrRid = GetCoreCLRRid();
+
+            if (coreclrRid == null)
+            {
+                return null;
+            }
+
+            string packageId = $"runtime.{coreclrRid}.Microsoft.NETCore.Jit";
+
+            return Path.Combine(
+                Dirs.NuGetPackages,
+                packageId,
+                _coreClrVersion);
+        }
+        
         private string GetCrossGenPackagePathForVersion()
         {
             string coreclrRid = GetCoreCLRRid();
@@ -157,11 +174,9 @@ namespace Microsoft.DotNet.Cli.Build
                     "-platform_assemblies_paths", platformAssembliesPaths
                 };
 
-                if (CurrentPlatform.IsUnix)
-                {
-                    crossgenArgs.Add("-JITPath");
-                    crossgenArgs.Add(GetLibCLRJitPathForVersion());
-                }
+                // Point to the JIT 
+                crossgenArgs.Add("-JITPath");
+                crossgenArgs.Add(GetLibCLRJitPathForVersion());
 
                 ExecSilent(_crossGenPath, crossgenArgs, env);
 
