@@ -120,7 +120,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             if (Directory.Exists(intermediatesOutputDirectory))
             {
-                Directory.Delete(intermediatesOutputDirectory);
+                FS.Rmdir(intermediatesOutputDirectory);
             }
             Directory.CreateDirectory(intermediatesOutputDirectory);
 
