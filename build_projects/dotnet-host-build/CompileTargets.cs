@@ -194,8 +194,7 @@ namespace Microsoft.DotNet.Host.Build
                 string cmakeHostFxrVer = $"-DCLI_CMAKE_HOST_FXR_VER:STRING={hostVersion.LatestHostFxrVersion.ToString()}";
                 string cmakeCommitHash = $"-DCLI_CMAKE_COMMIT_HASH:STRING={commitHash}";
                 string cmakeResourceDir = $"-DCLI_CMAKE_RESOURCE_DIR:STRING={resourceDir}";
-                string cmakeExtraArgs = "";
-
+                
                 switch (platform.ToLower())
                 {
                     case "x86":
@@ -207,8 +206,7 @@ namespace Microsoft.DotNet.Host.Build
                     case "arm":
                         cmakeBaseRid = "-DCLI_CMAKE_PKG_RID:STRING=win8-arm";
                         visualStudio = "Visual Studio 14 2015 ARM";
-                        archMacro = "-DCLI_CMAKE_PLATFORM_ARCH_ARM=1";
-                        cmakeExtraArgs += "-DCMAKE_SYSTEM_VERSION=10.0";
+                        archMacro = "-DCLI_CMAKE_PLATFORM_ARCH_ARM=1 -DCMAKE_SYSTEM_VERSION=10.0";
                         arch = "arm";
                         break;
                     case "arm64":
@@ -241,7 +239,6 @@ namespace Microsoft.DotNet.Host.Build
                     cmakeBaseRid,
                     cmakeCommitHash,
                     cmakeResourceDir,
-                    cmakeExtraArgs,
                     "-G",
                     visualStudio);
 
