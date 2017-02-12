@@ -137,9 +137,18 @@ namespace Microsoft.DotNet.Host.Build
 
         [Target]
         [BuildPlatforms(BuildPlatform.Ubuntu, BuildPlatform.Debian)]
-        [Environment("PACKAGE_PUBLISH", null, "", "0", "false")] // This is set to true for official crossbuild
         public static BuildTargetResult PackDotnetDebTool(BuildTargetContext c)
         {
+            var packagePublish = Environment.GetEnvironmentVariable("PACKAGE_PUBLISH");
+            if (!string.IsNullOrEmpty(packagePublish))
+            {
+                if (packagePublish == "1") {
+                    c.Info($"Skipping task for cross-build package publish");
+
+                    return c.Success();
+                }
+            }
+
             var dotnet = DotNetCli.Stage0;
             var versionSuffix = c.BuildContext.Get<BuildVersion>("BuildVersion").VersionSuffix;
 
@@ -359,9 +368,18 @@ namespace Microsoft.DotNet.Host.Build
         }
 
         [Target]
-        [Environment("PACKAGE_PUBLISH", null, "", "0", "false")] // This is set to true for official crossbuild
         public static BuildTargetResult RestorePackages(BuildTargetContext c)
         {
+            var packagePublish = Environment.GetEnvironmentVariable("PACKAGE_PUBLISH");
+            if (!string.IsNullOrEmpty(packagePublish))
+            {
+                if (packagePublish == "1") {
+                    c.Info($"Skipping task for cross-build package publish");
+
+                    return c.Success();
+                }
+            }
+            
             var dotnet = DotNetCli.Stage0;
 
             dotnet.Restore("--verbosity", "verbose", "--disable-parallel")
