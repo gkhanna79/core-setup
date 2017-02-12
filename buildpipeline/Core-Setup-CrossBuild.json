@@ -85,7 +85,7 @@
       },
       "inputs": {
         "filename": "docker",
-        "arguments": "exec --privileged $(PB_DockerContainerName) git clone $(PB_GitDirectory)",
+        "arguments": "exec --privileged $(PB_DockerContainerName) git clone $(PB_RepoUrl) $(PB_GitDirectory)",
         "workingFolder": "",
         "failOnStandardError": "false"
       }
