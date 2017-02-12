@@ -157,7 +157,7 @@
       },
       "inputs": {
         "filename": "sudo",
-        "arguments": "./$(PB_RepoName)/cross/build-rootfs.sh $(PB_Architecture) $(CrossToolsetVersion) $(SkipUnmount)",
+        "arguments": "./cross/build-rootfs.sh $(PB_Architecture) $(CrossToolsetVersion) $(SkipUnmount)",
         "workingFolder": "$(PB_RepoName)",
         "failOnStandardError": "false"
       }
