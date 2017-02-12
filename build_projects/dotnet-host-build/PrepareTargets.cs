@@ -142,11 +142,16 @@ namespace Microsoft.DotNet.Host.Build
             var packagePublish = Environment.GetEnvironmentVariable("PACKAGE_PUBLISH");
             if (!string.IsNullOrEmpty(packagePublish))
             {
-                if (packagePublish == "1") {
+                //if (packagePublish == "1") 
+                {
                     c.Info($"Skipping task for cross-build package publish");
 
                     return c.Success();
                 }
+            }
+            else
+            {
+                c.Info($"PACKAGE_PUBLISH={packagePublish}*");
             }
 
             var dotnet = DotNetCli.Stage0;
@@ -373,13 +378,18 @@ namespace Microsoft.DotNet.Host.Build
             var packagePublish = Environment.GetEnvironmentVariable("PACKAGE_PUBLISH");
             if (!string.IsNullOrEmpty(packagePublish))
             {
-                if (packagePublish == "1") {
+                //if (packagePublish == "1") 
+                {
                     c.Info($"Skipping task for cross-build package publish");
 
                     return c.Success();
                 }
             }
-            
+            else
+            {
+                c.Info($"PACKAGE_PUBLISH={packagePublish}*");
+            }
+
             var dotnet = DotNetCli.Stage0;
 
             dotnet.Restore("--verbosity", "verbose", "--disable-parallel")
