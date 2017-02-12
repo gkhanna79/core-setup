@@ -112,7 +112,7 @@
       "enabled": true,
       "continueOnError": false,
       "alwaysRun": false,
-      "displayName": "Cleanup RootFS",
+      "displayName": "Cleanup Repo",
       "timeoutInMinutes": 0,
       "task": {
         "id": "d9bafed4-0b18-4f58-968d-86655b4d2ce9",
@@ -121,7 +121,7 @@
       },
       "inputs": {
         "filename": "sudo",
-        "arguments": "docker exec --privileged $(PB_DockerContainerName) git clean -xdf $(PB_GitDirectory)/cross/",
+        "arguments": "docker exec --privileged $(PB_DockerContainerName) git clean -xdf $(PB_GitDirectory)",
         "workingFolder": "",
         "failOnStandardError": "false"
       }
