@@ -58,24 +58,6 @@
       "enabled": true,
       "continueOnError": false,
       "alwaysRun": false,
-      "displayName": "Start detached container",
-      "timeoutInMinutes": 0,
-      "task": {
-        "id": "d9bafed4-0b18-4f58-968d-86655b4d2ce9",
-        "versionSpec": "1.*",
-        "definitionType": "task"
-      },
-      "inputs": {
-        "filename": "docker",
-        "arguments": "run --privileged -d -w $(PB_GitDirectory) -v $(System.DefaultWorkingDirectory)/$(PB_RepoName):$(PB_GitDirectory) --name $(PB_DockerContainerName) $(PB_DockerImageName) sleep 7200",
-        "workingFolder": "",
-        "failOnStandardError": "false"
-      }
-    },
-    {
-      "enabled": true,
-      "continueOnError": false,
-      "alwaysRun": false,
       "displayName": "Build RootFS",
       "timeoutInMinutes": 0,
       "task": {
@@ -85,8 +67,8 @@
       },
       "inputs": {
         "filename": "sudo",
-        "arguments": "docker exec --privileged $(PB_DockerContainerName) $(PB_GitDirectory)/cross/build-rootfs.sh $(PB_Architecture) $(CrossToolsetVersion) $(SkipUnmount)",
-        "workingFolder": "",
+        "arguments": "./cross/build-rootfs.sh $(PB_Architecture) $(CrossToolsetVersion) $(SkipUnmount)",
+        "workingFolder": "$(PB_RepoName)",
         "failOnStandardError": "false"
       }
     },
@@ -102,9 +84,9 @@
         "definitionType": "task"
       },
       "inputs": {
-        "filename": "docker",
-        "arguments": "exec -e PUBLISH_TO_AZURE_BLOB -e CONNECTION_STRING -e CLI_NUGET_FEED_URL -e CLI_NUGET_API_KEY -e NUGET_FEED_URL -e NUGET_API_KEY -e GITHUB_PASSWORD $(PB_DockerContainerName) $(PB_GitDirectory)/build.sh $(CommonArguments) $(BuildArguments) $(portableLinux) --env-vars \"DISABLE_CROSSGEN=1,TARGETPLATFORM=$(PB_Architecture),TARGETRID=$(TargetRid),CROSS=1,SKIP_FINALIZEBUILD=1\"",
-        "workingFolder": "",
+        "filename": "./build.sh",
+        "arguments": "$(CommonArguments) $(BuildArguments) $(portableLinux) --env-vars \"DISABLE_CROSSGEN=1,TARGETPLATFORM=$(PB_Architecture),TARGETRID=$(TargetRid),CROSS=1\"",
+        "workingFolder": "$(PB_RepoName)",
         "failOnStandardError": "false"
       }
     },
@@ -112,7 +94,7 @@
       "enabled": true,
       "continueOnError": false,
       "alwaysRun": false,
-      "displayName": "Cleanup repo on host for package publish",
+      "displayName": "Cleanup repo on host",
       "timeoutInMinutes": 0,
       "task": {
         "id": "d9bafed4-0b18-4f58-968d-86655b4d2ce9",
@@ -122,78 +104,6 @@
       "inputs": {
         "filename": "sudo",
         "arguments": "git clean -xdf $(PB_RepoName)",
-        "workingFolder": "",
-        "failOnStandardError": "false"
-      }
-    },
-    {
-      "enabled": true,
-      "continueOnError": false,
-      "alwaysRun": false,
-      "displayName": "Publish Packages from host machine",
-      "timeoutInMinutes": 0,
-      "task": {
-        "id": "d9bafed4-0b18-4f58-968d-86655b4d2ce9",
-        "versionSpec": "1.*",
-        "definitionType": "task"
-      },
-      "inputs": {
-        "filename": "./build.sh",
-        "arguments": "$(CommonArguments) $(PublishArguments) $(portableLinux) --env-vars \"DISABLE_CROSSGEN=1,TARGETPLATFORM=$(PB_Architecture),TARGETRID=$(TargetRid),CROSS=1\"",
-        "workingFolder": "$(PB_RepoName)",
-        "failOnStandardError": "false"
-      }
-    },
-    {
-      "enabled": true,
-      "continueOnError": false,
-      "alwaysRun": false,
-      "displayName": "Cleanup RootFS",
-      "timeoutInMinutes": 0,
-      "task": {
-        "id": "d9bafed4-0b18-4f58-968d-86655b4d2ce9",
-        "versionSpec": "1.*",
-        "definitionType": "task"
-      },
-      "inputs": {
-        "filename": "sudo",
-        "arguments": "docker exec --privileged $(PB_DockerContainerName) git clean -xdf $(PB_GitDirectory)/cross/",
-        "workingFolder": "",
-        "failOnStandardError": "false"
-      }
-    },
-    {
-      "enabled": true,
-      "continueOnError": false,
-      "alwaysRun": false,
-      "displayName": "Stop Container",
-      "timeoutInMinutes": 0,
-      "task": {
-        "id": "d9bafed4-0b18-4f58-968d-86655b4d2ce9",
-        "versionSpec": "1.*",
-        "definitionType": "task"
-      },
-      "inputs": {
-        "filename": "docker",
-        "arguments": "stop $(PB_DockerContainerName)",
-        "workingFolder": "",
-        "failOnStandardError": "false"
-      }
-    },
-    {
-      "enabled": true,
-      "continueOnError": false,
-      "alwaysRun": false,
-      "displayName": "Remove Container",
-      "timeoutInMinutes": 0,
-      "task": {
-        "id": "d9bafed4-0b18-4f58-968d-86655b4d2ce9",
-        "versionSpec": "1.*",
-        "definitionType": "task"
-      },
-      "inputs": {
-        "filename": "docker",
-        "arguments": "rm $(PB_DockerContainerName)",
         "workingFolder": "",
         "failOnStandardError": "false"
       }
