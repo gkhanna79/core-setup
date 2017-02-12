@@ -321,10 +321,6 @@
       "value": "ubuntu.14.04-arm",
       "allowOverride": true
     },
-    "PB_RepoUrl": {
-      "value": "https://github.com/dotnet/core-setup.git",
-      "allowOverride": true
-    },
     "SourceVersion": {
       "value": "",
       "allowOverride": true
