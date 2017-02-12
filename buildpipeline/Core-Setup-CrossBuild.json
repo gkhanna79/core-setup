@@ -193,7 +193,7 @@
       },
       "inputs": {
         "filename": "./build.sh",
-        "arguments": "$(CommonArguments) $(PublishArguments) $(portableLinux) --env-vars \"DISABLE_CROSSGEN=1,TARGETPLATFORM=$(PB_Architecture),TARGETRID=$(TargetRid),CROSS=1,PACKAGE_PUBLISH=1\"",
+        "arguments": "--configuration $(BuildConfiguration) $(PublishArguments) $(portableLinux) --env-vars \"DISABLE_CROSSGEN=1,TARGETPLATFORM=$(PB_Architecture),TARGETRID=$(TargetRid),CROSS=1,PACKAGE_PUBLISH=1\"",
         "workingFolder": "$(PB_RepoName)",
         "failOnStandardError": "false"
       }
