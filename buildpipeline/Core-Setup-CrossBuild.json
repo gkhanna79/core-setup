@@ -247,7 +247,7 @@
       "allowOverride": true
     },
     "PublishArguments": {
-      "value": "--targets FinalizeBuild",
+      "value": "--targets Prepare,FinalizeBuild",
       "allowOverride": true
     },
     "CONNECTION_STRING": {

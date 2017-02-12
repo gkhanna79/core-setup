@@ -69,13 +69,21 @@ namespace Microsoft.DotNet.Host.Build
             return c.Success();
         }
 
-        [Target(nameof(PrepareTargets.Init),
-        nameof(PublishTargets.InitPublish))]
-        [Environment("SKIP_FINALIZEBUILD", null, "", "0", "false")] // This is set to true for official crossbuild
+        [Target]
         public static BuildTargetResult FinalizeBuild(BuildTargetContext c)
         {
             if (CheckIfAllBuildsHavePublished(c))
             {
+                var skipFinalizeBuild = Environment.GetEnvironmentVariable("SKIP_FINALIZEBUILD");
+                if (!string.IsNullOrEmpty(skipFinalizeBuild)) {
+                    if (skipFinalizeBuild == "1") {
+                        // This build has another step to finalize the build, so skip it for now.
+                        c.Info("Skipping FinalizeBuild as packages will be published seperately.");
+
+                        return c.Success();
+                    }
+                }
+
                 string targetContainer = $"{Channel}/Binaries/Latest/";
                 string targetVersionFile = $"{targetContainer}{CommitHash}";
                 string semaphoreBlob = $"{Channel}/Binaries/sharedFxPublishSemaphore";
