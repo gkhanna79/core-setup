@@ -137,6 +137,7 @@ namespace Microsoft.DotNet.Host.Build
 
         [Target]
         [BuildPlatforms(BuildPlatform.Ubuntu, BuildPlatform.Debian)]
+        [Environment("PACKAGE_PUBLISH", null, "", "0", "false")] // This is set to true for official crossbuild
         public static BuildTargetResult PackDotnetDebTool(BuildTargetContext c)
         {
             var dotnet = DotNetCli.Stage0;
@@ -358,6 +359,7 @@ namespace Microsoft.DotNet.Host.Build
         }
 
         [Target]
+        [Environment("PACKAGE_PUBLISH", null, "", "0", "false")] // This is set to true for official crossbuild
         public static BuildTargetResult RestorePackages(BuildTargetContext c)
         {
             var dotnet = DotNetCli.Stage0;
