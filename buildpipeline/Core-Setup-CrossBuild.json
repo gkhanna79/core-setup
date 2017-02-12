@@ -67,7 +67,25 @@
       },
       "inputs": {
         "filename": "docker",
-        "arguments": "run --privileged -d -w $(PB_GitDirectory) -v $(System.DefaultWorkingDirectory)/$(PB_RepoName):$(PB_GitDirectory) --name $(PB_DockerContainerName) $(PB_DockerImageName) sleep 7200",
+        "arguments": "run --privileged -d -w $(PB_GitDirectory) --name $(PB_DockerContainerName) $(PB_DockerImageName) sleep 7200",
+        "workingFolder": "",
+        "failOnStandardError": "false"
+      }
+    },
+    {
+      "enabled": true,
+      "continueOnError": false,
+      "alwaysRun": false,
+      "displayName": "Clone repo in container",
+      "timeoutInMinutes": 0,
+      "task": {
+        "id": "d9bafed4-0b18-4f58-968d-86655b4d2ce9",
+        "versionSpec": "1.*",
+        "definitionType": "task"
+      },
+      "inputs": {
+        "filename": "docker",
+        "arguments": "exec --privileged $(PB_DockerContainerName) git clone $(PB_GitDirectory)",
         "workingFolder": "",
         "failOnStandardError": "false"
       }
@@ -104,24 +122,6 @@
       "inputs": {
         "filename": "docker",
         "arguments": "exec -e PUBLISH_TO_AZURE_BLOB -e CONNECTION_STRING -e CLI_NUGET_FEED_URL -e CLI_NUGET_API_KEY -e NUGET_FEED_URL -e NUGET_API_KEY -e GITHUB_PASSWORD $(PB_DockerContainerName) $(PB_GitDirectory)/build.sh $(CommonArguments) $(BuildArguments) $(portableLinux) --env-vars \"DISABLE_CROSSGEN=1,TARGETPLATFORM=$(PB_Architecture),TARGETRID=$(TargetRid),CROSS=1,SKIP_FINALIZEBUILD=1\"",
-        "workingFolder": "",
-        "failOnStandardError": "false"
-      }
-    },
-    {
-      "enabled": true,
-      "continueOnError": false,
-      "alwaysRun": false,
-      "displayName": "Cleanup repo on host for package publish",
-      "timeoutInMinutes": 0,
-      "task": {
-        "id": "d9bafed4-0b18-4f58-968d-86655b4d2ce9",
-        "versionSpec": "1.*",
-        "definitionType": "task"
-      },
-      "inputs": {
-        "filename": "sudo",
-        "arguments": "git clean -xdf $(PB_RepoName)",
         "workingFolder": "",
         "failOnStandardError": "false"
       }
@@ -247,7 +247,7 @@
       "allowOverride": true
     },
     "PublishArguments": {
-      "value": "--targets Prepare,GenerateVersions,FinalizeBuild",
+      "value": "--targets FinalizeBuild",
       "allowOverride": true
     },
     "CONNECTION_STRING": {
