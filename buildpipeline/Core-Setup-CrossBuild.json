@@ -66,7 +66,7 @@
         "definitionType": "task"
       },
       "inputs": {
-        "filename": "./build.sh",
+        "filename": "./$(PB_RepoName)/build.sh",
         "arguments": "$(CommonArguments) $(PublishArguments) $(portableLinux) --env-vars \"DISABLE_CROSSGEN=1,TARGETPLATFORM=$(PB_Architecture),TARGETRID=$(TargetRid),CROSS=1\"",
         "workingFolder": "$(PB_RepoName)",
         "failOnStandardError": "false"
