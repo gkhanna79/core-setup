@@ -304,7 +304,7 @@
       "allowOverride": true
     },
     "PB_RepoUrl": {
-      "value": "https://github.com/dotnet/core-setup.git",
+      "value": "https://github.com/gkhanna79/core-setup.git",
       "allowOverride": true
     },
     "SourceVersion": {
