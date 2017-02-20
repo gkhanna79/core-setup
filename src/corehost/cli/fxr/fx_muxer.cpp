@@ -323,24 +323,30 @@ pal::string_t fx_muxer_t::resolve_fx_dir(host_mode_t mode, const pal::string_t& 
     assert(mode == host_mode_t::muxer);
 
     trace::verbose(_X("--- Resolving FX directory from muxer dir '%s', specified '%s'"), own_dir.c_str(), specified_fx_version.c_str());
+    
+    // Get the name of the SharedFX and it's' version to activate.
     const auto fx_name = config.get_fx_name();
     const auto fx_ver = specified_fx_version.empty() ? config.get_fx_version() : specified_fx_version;
 
-    fx_ver_t specified(-1, -1, -1);
-    if (!fx_ver_t::parse(fx_ver, &specified, false))
+    // Fail if we are unable to parse the requested FX version
+    fx_ver_t requestedFXVer(-1, -1, -1);
+    if (!fx_ver_t::parse(fx_ver, &requestedFXVer, false))
     {
         trace::error(_X("The specified framework version '%s' could not be parsed"), fx_ver.c_str());
         return pal::string_t();
     }
 
+    // Form the path the folder for SharedFX under which version specific folders are present.
     auto fx_dir = own_dir;
     append_path(&fx_dir, _X("shared"));
     append_path(&fx_dir, fx_name.c_str());
 
+    // If we have been specified to activate against a specific version of SharedFX, then we do not apply any roll forward
+    // policies. Otherwise, determine whether we can roll forward the FX version or not.
     bool do_roll_forward = false;
     if (specified_fx_version.empty())
     {
-        if (!specified.is_prerelease())
+        if (!requestedFXVer.is_prerelease())
         {
             // If production and no roll forward use given version.
             do_roll_forward = config.get_patch_roll_fwd();
@@ -361,33 +367,88 @@ pal::string_t fx_muxer_t::resolve_fx_dir(host_mode_t mode, const pal::string_t& 
     }
     else
     {
+        // We will start processing the version from the one specified in runtimeconfig.json
         trace::verbose(_X("Attempting FX roll forward starting from [%s]"), fx_ver.c_str());
 
+        // Read the version folders under the SharedFX location
         std::vector<pal::string_t> list;
         pal::readdir(fx_dir, &list);
-        fx_ver_t most_compatible = specified;
+
+        // Process each versioned folder, applying the rollforward policy as applicable.
+        fx_ver_t most_compatible = requestedFXVer;
+        fx_ver_t ver_next_min_higher = requestedFXVer;
+        bool fFoundMostCompatible = false;
+
+        // Check if the requested FX version folder exists or not
+        auto fxVerDir = fx_dir;
+        append_path(&fxVerDir,fx_ver.c_str());
+        bool fRequestedFXVerFolderExists = pal::file_exists(fxVerDir);
+
+        // Check if we have been requested to unconditionally rollforward if requested FX is missing.
+        bool fRollForwardOnMissingCandidateFX = false;
+
+        pal::string_t rollForwardOnMissingFX_str;
+        if (pal::getenv(_X("DOTNET_ROLLFORWARD_NO_CANDIDATE_FX"), &rollForwardOnMissingFX_str))
+        {
+            auto rollForwardOnMissingFX_val = pal::xtoi(rollForwardOnMissingFX_str.c_str());
+            if (rollForwardOnMissingFX_val > 0)
+            {
+               fRollForwardOnMissingCandidateFX = true;
+            }
+        }
+
         for (const auto& version : list)
         {
             trace::verbose(_X("Inspecting version... [%s]"), version.c_str());
             fx_ver_t ver(-1, -1, -1);
-            if (!specified.is_prerelease() && fx_ver_t::parse(version, &ver, true) && // true -- only prod. prevents roll forward to prerelease.
-                ver.get_major() == specified.get_major() &&
-                ver.get_minor() == specified.get_minor())
+
+            // If the requested FX version is production version, then look for the latst patch to use.
+            if (!requestedFXVer.is_prerelease() && fx_ver_t::parse(version, &ver, true) && // true -- only prod. prevents roll forward to prerelease.
+                ver.get_major() == requestedFXVer.get_major() &&
+                ver.get_minor() == requestedFXVer.get_minor())
             {
                 // Pick the greatest production that differs only in patch.
                 most_compatible = std::max(ver, most_compatible);
+                fFoundMostCompatible = true;
             }
-            if (specified.is_prerelease() && fx_ver_t::parse(version, &ver, false) && // false -- implies both production and prerelease.
+
+            // If the requested FX version is pre-release version, then look for the next minimal build number if 
+            // the requested FX version is missing.
+            if (requestedFXVer.is_prerelease() && fx_ver_t::parse(version, &ver, false) && // false -- implies both production and prerelease.
                 ver.is_prerelease() && // prevent roll forward to production.
-                ver.get_major() == specified.get_major() &&
-                ver.get_minor() == specified.get_minor() &&
-                ver.get_patch() == specified.get_patch() &&
-                ver > specified)
+                ver.get_major() == requestedFXVer.get_major() &&
+                ver.get_minor() == requestedFXVer.get_minor() &&
+                ver.get_patch() == requestedFXVer.get_patch() &&
+                ver > requestedFXVer)
             {
-                // Pick the smallest prerelease that is greater than specified.
-                most_compatible = (most_compatible == specified) ? ver : std::min(ver, most_compatible);
+                // Pick the smallest prerelease that is greater than requestedFXVer if the requested FX version folder
+                // does not exist.
+                if (!fRequestedFXVerFolderExists) {
+                    most_compatible = (most_compatible == requestedFXVer) ? ver : std::min(ver, most_compatible);
+                }
+
+                fFoundMostCompatible = true;
+            }
+
+            // If the enumerated version if higher then the requested version, then 
+            // update the next minimum higher version, if applicable.
+            if (ver > requestedFXVer) {
+                ver_next_min_higher = (ver_next_min_higher == requestedFXVer)? ver: std::min(ver, ver_next_min_higher);
             }
         }
+
+        // If we didn't find a compatible FX version folder and the requested FX version folder
+        // does not exist, check if we have been asked to roll forward unconditionally. If we have been,
+        // then pickup the next minimum higher version available.
+        if (!fFoundMostCompatible) {
+            if (!fRequestedFXVerFolderExists) {
+                if (fRollForwardOnMissingCandidateFX) {
+                    most_compatible = ver_next_min_higher;
+                    trace::verbose(_X("DOTNET_ROLLFORWARD_NO_CANDIDATE_FX: Applied roll forward policy to next minimum higher version as no candidate FX was found."));
+                }
+            }
+        }
+
         pal::string_t most_compatible_str = most_compatible.as_str();
         append_path(&fx_dir, most_compatible_str.c_str());
     }
