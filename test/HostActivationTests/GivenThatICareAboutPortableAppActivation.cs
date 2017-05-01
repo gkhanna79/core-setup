@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.PortableApp
             var dotnet = fixture.BuiltDotnet;
             var appDll = fixture.TestProject.AppDll;
 
-            dotnet.Exec(appDll)
+            dotnet.Exec("--fx-version", fixture.SharedFXVersion, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute()
@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.PortableApp
                 .And
                 .HaveStdOutContaining("Hello World");
 
-            dotnet.Exec("exec", appDll)
+            dotnet.Exec("exec", "--fx-version", fixture.SharedFXVersion, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute()
@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.PortableApp
             var appDll = fixture.TestProject.AppDll;
             var runtimeConfig = fixture.TestProject.RuntimeConfigJson;
             
-            dotnet.Exec("exec", "--runtimeconfig", runtimeConfig, appDll)
+            dotnet.Exec("exec", "--fx-version", fixture.SharedFXVersion, "--runtimeconfig", runtimeConfig, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute(fExpectedToFail:true)
@@ -94,6 +94,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.PortableApp
 
             dotnet.Exec(
                     "exec",
+                    "--fx-version", fixture.SharedFXVersion,
                     "--runtimeconfig", runtimeConfig,
                     "--additionalprobingpath", additionalProbingPath,
                     appDll)
@@ -118,7 +119,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.PortableApp
             var appDll = fixture.TestProject.AppDll;
             var depsJson = fixture.TestProject.DepsJson;
 
-            dotnet.Exec("exec", "--depsfile", depsJson, appDll)
+            dotnet.Exec("exec", "--fx-version", fixture.SharedFXVersion, "--depsfile", depsJson, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute()
@@ -138,7 +139,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.PortableApp
             var dotnet = fixture.BuiltDotnet;
             var appDll = fixture.TestProject.AppDll;
 
-            dotnet.Exec(appDll)
+            dotnet.Exec("--fx-version", fixture.SharedFXVersion, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute()
@@ -147,7 +148,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.PortableApp
                 .And
                 .HaveStdOutContaining("Hello World");
 
-            dotnet.Exec("exec", appDll)
+            dotnet.Exec("exec", "--fx-version", fixture.SharedFXVersion, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute()
@@ -170,7 +171,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.PortableApp
             var appDll = fixture.TestProject.AppDll;
             var runtimeConfig = fixture.TestProject.RuntimeConfigJson;
 
-            dotnet.Exec("exec", "--runtimeconfig", runtimeConfig, appDll)
+            dotnet.Exec("exec", "--fx-version", fixture.SharedFXVersion, "--runtimeconfig", runtimeConfig, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute()
@@ -192,7 +193,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.PortableApp
             var appDll = fixture.TestProject.AppDll;
             var depsJson = fixture.TestProject.DepsJson;
 
-            dotnet.Exec("exec", "--depsfile", depsJson, appDll)
+            dotnet.Exec("exec", "--fx-version", fixture.SharedFXVersion, "--depsfile", depsJson, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute(fExpectedToFail:true)

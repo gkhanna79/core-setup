@@ -120,12 +120,14 @@ namespace Microsoft.DotNet.Host.Build
                 c.Info($"Running tests in: {project}");
 
                 string actualTargetRid = c.BuildContext.Get<string>("ArtifactsTargetRID");
-                
+                string sharedFrameworkNugetVersion = c.BuildContext.Get<string>("SharedFrameworkNugetVersion");
+
                 var result = dotnet.Test("--configuration", configuration, "-xml", $"{project}-testResults.xml", "-notrait", "category=failing")
                     .WorkingDirectory(Path.Combine(Dirs.RepoRoot, "test", project))
                     .EnvironmentVariable("PATH", $"{dotnet.BinPath}{Path.PathSeparator}{Environment.GetEnvironmentVariable("PATH")}")
                     .EnvironmentVariable("TEST_ARTIFACTS", Dirs.TestArtifacts)
                     .EnvironmentVariable("TEST_TARGETRID", actualTargetRid)
+                    .EnvironmentVariable("TEST_SHARED_FX_VERSION", sharedFrameworkNugetVersion)
                     .Execute();
 
                 if (result.ExitCode != 0)

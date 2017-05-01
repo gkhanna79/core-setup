@@ -54,6 +54,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
 
             dotnet.Exec(
                     "exec",
+                    "--fx-version", testProjectFixture.SharedFXVersion,
                     "--runtimeconfig", runtimeConfig,
                     "--depsfile", depsJson,
                     "--additionalProbingPath", additionalProbingPath,

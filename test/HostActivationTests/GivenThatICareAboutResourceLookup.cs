@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.ResourceLookup
             var dotnet = fixture.BuiltDotnet;
             var appDll = fixture.TestProject.AppDll;
 
-            dotnet.Exec(appDll)
+            dotnet.Exec("--fx-version", fixture.SharedFXVersion, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute()
@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.ResourceLookup
                 .And
                 .HaveStdOutContaining("Hello World");
 
-            dotnet.Exec("exec", appDll)
+            dotnet.Exec("exec", "--fx-version", fixture.SharedFXVersion, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute()
@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.ResourceLookup
             var dotnet = fixture.BuiltDotnet;
             var appDll = fixture.TestProject.AppDll;
 
-            dotnet.Exec(appDll)
+            dotnet.Exec("--fx-version", fixture.SharedFXVersion, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute()
@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.ResourceLookup
                 .And
                 .HaveStdOutContaining("Hello World");
 
-            dotnet.Exec("exec", appDll)
+            dotnet.Exec("exec", "--fx-version", fixture.SharedFXVersion, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute()

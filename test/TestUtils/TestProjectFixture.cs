@@ -13,6 +13,7 @@ namespace Microsoft.DotNet.CoreSetup.Test
     public class TestProjectFixture
     {
         private static readonly string s_testArtifactDirectoryEnvironmentVariable = "TEST_ARTIFACTS";
+        private static readonly string s_SharedFXVersionEnvironmentVariable = "TEST_SHARED_FX_VERSION";
 
         private string _testProjectName;
         private string _exeExtension;
@@ -21,6 +22,8 @@ namespace Microsoft.DotNet.CoreSetup.Test
         private string _testProjectSourceDirectory;
         private string _testArtifactDirectory;
         private string _currentRid;
+
+        private string _sharedFXVersion;
 
         private RepoDirectoriesProvider _repoDirectoriesProvider;
 
@@ -38,6 +41,8 @@ namespace Microsoft.DotNet.CoreSetup.Test
         public string ExeExtension => _exeExtension;
         public string SharedLibraryExtension => _sharedLibraryExtension;
         public string SharedLibraryPrefix => _sharedLibraryPrefix;
+
+        public string SharedFXVersion => _sharedFXVersion;
 
         public TestProjectFixture(
             string testProjectName,
@@ -71,6 +76,7 @@ namespace Microsoft.DotNet.CoreSetup.Test
 
             _sdkDotnet = new DotNetCli(dotnetInstallPath ?? DotNetCli.GetStage0Path(repoDirectoriesProvider.RepoRoot));
             _currentRid = currentRid ?? repoDirectoriesProvider.TargetRID;
+            _sharedFXVersion = Environment.GetEnvironmentVariable(s_SharedFXVersionEnvironmentVariable);
 
             _builtDotnet = new DotNetCli(repoDirectoriesProvider.BuiltDotnet);
 
@@ -96,7 +102,8 @@ namespace Microsoft.DotNet.CoreSetup.Test
             _currentRid = fixtureToCopy._currentRid;
             _builtDotnet = fixtureToCopy._builtDotnet;
             _sourceTestProject = fixtureToCopy._sourceTestProject;
-
+            _sharedFXVersion = fixtureToCopy._sharedFXVersion;
+            
             _testProject = CopyTestProject(
                 fixtureToCopy.TestProject,
                 _testArtifactDirectory,

@@ -59,8 +59,8 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.LightupApp
             var dotnet = fixtureApp.BuiltDotnet;
             var appDll = fixtureApp.TestProject.AppDll;
             var libDepsJson = fixtureLib.TestProject.DepsJson;
-
-            dotnet.Exec("exec", "--additional-deps", libDepsJson, appDll)
+            
+            dotnet.Exec("exec", "--fx-version", fixtureApp.SharedFXVersion, "--additional-deps", libDepsJson, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute(fExpectedToFail:true)
@@ -114,7 +114,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.LightupApp
             File.Copy(libDll, destLibPath);
 
             // Execute the test using the custom lightup path where lightup.deps.json can be found.
-            dotnet.Exec("exec", "--additional-deps", baseDir, appDll)
+            dotnet.Exec("exec", "--fx-version", fixtureApp.SharedFXVersion, "--additional-deps", baseDir, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute()
@@ -144,7 +144,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.LightupApp
             // Copy the library to the location of the lightup app
             File.Copy(libDll, destLibPath);
 
-            dotnet.Exec("exec", appDll)
+            dotnet.Exec("exec", "--fx-version", fixtureApp.SharedFXVersion, appDll)
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute(fExpectedToFail:true)
